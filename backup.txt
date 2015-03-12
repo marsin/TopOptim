@@ -1,0 +1,235 @@
+float objective1D(GAGenome & c)
+{
+  GA1DArrayAlleleGenome<int> & genome = (GA1DArrayAlleleGenome<int> &)c;
+  GAUserData l_userData = *(GAUserData*)genome.userData();
+  CmPartp part = l_userData.part;
+  std::set<unsigned int> LoadsSet = part->GetAllLoadsIndex();
+  std::set<unsigned int> BCsSet = part->GetAllBCsIndex();
+  float value=0.0;
+  int count=0;
+  unsigned int error = 0;
+  bool goodGenome = false;
+
+//  for(std::set<unsigned int>::iterator it=LoadsSet.begin();
+//      it != LoadsSet.end(); ++it  )
+//  {
+//    if(genome.gene(*it) == 0)
+//    {
+//      genome.gene(*it,1);
+//    }
+//  }
+//  for(std::set<unsigned int>::iterator it=BCsSet.begin();
+//      it != BCsSet.end(); ++it  )
+//  {
+//    if(genome.gene(*it) == 0)
+//    {
+//      genome.gene(*it,1);
+//    }
+//  }
+  std::vector<CmGroupp> groups;
+  std::set<unsigned int> toCheck;
+//  for(unsigned int i = 0; i<part->Faces().size();i++)
+//  {
+//    toCheck.insert(i);
+//  }
+//  {
+//    std::vector<CmFacep> faces = part->Faces();
+//    std::set<unsigned int>::iterator cIt;
+//    unsigned int groupIndex = 0;
+//    std::set<unsigned int> saved;
+//    while(toCheck.size()>0)
+//    {
+//      cIt = toCheck.begin();
+//      CmGroupp group = CmGroupp(new CmGroup());
+//      if(genome.gene(*cIt)>0)
+//      {
+//        group->AddMember(*cIt);
+//        std::set<unsigned int> neighbors = faces[*cIt]->GetNeighbors();
+//        toCheck.erase(cIt);
+//        toCheck.insert(saved.begin(),saved.end());
+//        CheckNeighbors(neighbors,group,faces,genome,toCheck);
+//        if(group->GetMembers().size()>1 || group->GetNeighbors().size()>0)
+//        {
+//          group->SetIndex(groupIndex);
+//          groups.push_back(group);
+//          groupIndex++;
+//        }
+//      }
+//      else
+//      {
+//        saved.insert(*cIt);
+//        toCheck.erase(cIt);
+//      }
+//    }
+//  }
+//  std::set<std::pair<unsigned int,unsigned int> >connectedGroups;
+//  for(std::vector<CmGroupp>::iterator git=groups.begin();git!=groups.end();git++)
+//  {
+//    bool connected = false;
+//    for(std::vector<CmGroupp>::iterator git2=groups.begin();git2!=groups.end();git2++)
+//    {
+//      //        if(!(connectedGroups.find(std::make_pair<unsigned int,unsigned int>((*git)->GetIndex(),(*git2)->GetIndex())) != connectedGroups.end()))
+//      {
+//        if((*git)->GetIndex() != (*git2)->GetIndex())
+//        {
+//          std::set<unsigned int> neighbors = ((*git)->GetNeighbors());
+//          std::set<unsigned int> neighbors2 = ((*git2)->GetNeighbors());
+//          for(std::set<unsigned int>::iterator nit=neighbors.begin();nit!=neighbors.end();nit++)
+//          {
+//            if(neighbors2.find(*nit) != neighbors2.end())
+//            {
+//              int stage = 0;
+//              CmFacep candidate = part->Faces()[*nit];
+//              std::set<unsigned int> mems = (*git)->GetMembers();
+//              for(std::set<unsigned int>::iterator itcc=mems.begin();itcc!=mems.end();itcc++)
+//              {
+//                CmFacep second = part->Faces()[*itcc];
+//                for(std::set<unsigned int>::iterator itve=candidate->VerticesNums().begin();
+//                    itve!=candidate->VerticesNums().end();itve++)
+//                {
+
+//                }
+//                if(candidate->VerticesNums().find(*itcc) != candidate->VerticesNums().end())
+//                {
+//                  stage++;
+//                  break;
+//                }
+//              }
+//              genome.gene(*nit,1);
+//              //(*git)->RemoveNeighbor(*nit);
+//              //(*git2)->RemoveNeighbor(*nit);
+
+//              //                    connectedGroups.insert(std::make_pair<unsigned int,unsigned int>((*git)->GetIndex(),(*git2)->GetIndex()));
+//              //                    connectedGroups.insert(std::make_pair<unsigned int,unsigned int>((*git2)->GetIndex(),(*git)->GetIndex()));
+//              break;
+//            }
+//          }
+//        }
+//      }
+//    }
+//  }
+//  groups.clear();
+//  toCheck.clear();
+//  for(unsigned int i = 0; i<part->Faces().size();i++)
+//  {
+//    toCheck.insert(i);
+//  }
+//  {
+//    std::vector<CmFacep> faces = part->Faces();
+//    std::set<unsigned int>::iterator cIt;
+//    unsigned int groupIndex = 0;
+//    while(toCheck.size()>0)
+//    {
+//      cIt = toCheck.begin();
+//      CmGroupp group = CmGroupp(new CmGroup());
+//      group->AddMember(*cIt);
+//      std::set<unsigned int> neighbors = faces[*cIt]->GetNeighbors();
+//      toCheck.erase(cIt);
+//      CheckNeighbors(neighbors,group,faces,genome,toCheck);
+//      if(group->GetMembers().size()>1 || group->GetNeighbors().size()>0)
+//      {
+//        unsigned int contains = 0;
+//        for(std::set<unsigned int>::iterator lit=LoadsSet.begin();
+//            lit != LoadsSet.end(); ++lit  )
+//        {
+//          if(group->MembersContians(*lit))
+//          {
+//            contains++;
+//          }
+//        }
+//        for(std::set<unsigned int>::iterator bit=BCsSet.begin();
+//            bit != BCsSet.end(); ++bit  )
+//        {
+//          if(group->MembersContians(*bit))
+//          {
+//            contains++;
+//          }
+//        }
+//        if(contains > 0)
+//        {
+//          group->SetIndex(groupIndex);
+//          group->SetGroupType(EnMaterial);
+//          groups.push_back(group);
+//          groupIndex++;
+//        }
+//        else
+//        {
+//          std::set<unsigned int> members = group->GetMembers();
+//          for(std::set<unsigned int>::iterator grit=members.begin();grit!=members.end();grit++)
+//          {
+//            genome.gene(*grit,0);
+//          }
+//        }
+//      }
+
+//    }
+//  }
+//  if(groups.size() > 1)
+//  {
+//    std::cerr << "Bad genome";
+//    return (0);
+//  }
+  std::vector<CmGroupp> holes;
+  toCheck.clear();
+  for(unsigned int i = 0; i<part->Faces().size();i++)
+  {
+    toCheck.insert(i);
+  }
+  {
+    std::vector<CmFacep> faces = part->Faces();
+    std::set<unsigned int>::iterator cIt;
+    unsigned int groupIndex = 0;
+    while(toCheck.size()>0)
+    {
+      cIt = toCheck.begin();
+      CmGroupp group = CmGroupp(new CmGroup());
+      group->AddMember(*cIt);
+      std::set<unsigned int> neighbors = faces[*cIt]->GetNeighbors();
+      toCheck.erase(cIt);
+      CheckNeighbors(neighbors,group,faces,genome,toCheck,0);
+      group->SetIndex(groupIndex);
+      holes.push_back(group);
+      groupIndex++;
+    }
+  }
+
+  FileManager::SaveGenomeToFile(genome, "temp.genome");
+
+  QProcess exec;
+  std::string appPath = l_userData.config.abaqusBatPath;
+  std::string scriptPath = l_userData.config.runForGenomeScriptPath;
+  std::string command = appPath + " cae noGUI=" + scriptPath;
+  exec.start(command.c_str());
+  exec.waitForFinished();
+  int exitcode = exec.exitCode();
+  if (exitcode != 0)
+  {
+    std::cerr << "script failed";
+    return 0;
+  }
+  std::ifstream resultFile;
+  resultFile.open("temp.genomeResult");
+  if(!resultFile)
+  {
+    error = ERR_OPEN_FILE;
+    std::cerr << "error opening file";
+    return 0;
+  }
+  while(resultFile.good())
+  {
+    std::string line;
+    std::getline(resultFile,line);
+    value = atof(line.c_str());
+    break;
+  }
+  if(l_userData.config.selectedOptimizationDebugLevel == optimizationDebugLevel::fullDebug)
+  {
+    FileManager::CopyFile("temp.genome", "TopOptimDebug/genome_"
+                          + QString::number(value).toStdString());
+  }
+
+  std::cerr << value;
+  //std::cerr << "Holes: " << holes.size();
+  return(value);
+}
+
