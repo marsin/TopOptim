@@ -9,6 +9,7 @@
 #include <iostream>
 #include <fstream>
 #include <QtConcurrent/QtConcurrentRun>
+#include <genomecollection.h>
 
 std::string itos(long n){
   std::stringstream stream;
@@ -274,7 +275,7 @@ void CmOptimalizationManager::setupOptimalization(const CmPartp &part, const con
 
 void CmOptimalizationManager::Init()
 {
-  unsigned int seed = 0;
+  unsigned int l_seed = 0;
   // TODO: make aset auto settable
   fm::FileManager::DeleteAnyFile(m_conf.projectName);
   int aset[] = {0,1,0,1};
@@ -325,7 +326,7 @@ void CmOptimalizationManager::Init()
   s_generationCounter = 1;
   fm::FileManager::AppendToGenomeCollector(m_conf, std::string("\n\n"));
   fm::FileManager::AppendToGenomeCollector(m_conf, "#Genome Collection\n");
-  ga.initialize(0);
+  ga.initialize(l_seed);
   while(!ga.done())
   {
     ga.step();
@@ -421,8 +422,8 @@ float objective1D(GAGenome & c)
   GA1DArrayAlleleGenome<int> & genome = (GA1DArrayAlleleGenome<int> &)c;
   GAUserData l_userData = *(GAUserData*)genome.userData();
   GA1DArrayAlleleGenome<int> l_genomeOut = genome;
+  GenomeCollection l_genomeCollection{};
   float value=0.0;
-  unsigned int error = 0;
   for(auto l_load : l_userData.part->GetAllLoadsIndex())
   {
       genome.gene(l_load, 1);
@@ -438,34 +439,38 @@ float objective1D(GAGenome & c)
   fm::FileManager::DeleteAnyFile("temp.genome");
   fm::FileManager::SaveGenomeToFile(l_genomeOut, "temp.genome");
 
-
   std::cerr << "generation: " << s_generationCounter << std::endl;
-  QProcess exec;
-  std::string appPath = l_userData.config.abaqusBatPath;
-  std::string scriptPath = l_userData.config.runForGenomeScriptPath;
-  std::string command = appPath + " cae noGUI=" + scriptPath;
-  exec.start(command.c_str());
-  exec.waitForFinished();
-  int exitcode = exec.exitCode();
-  if (exitcode != 0)
+
+  if (not l_genomeCollection.isInCollection(l_genomeOut))
   {
-    std::cerr << "script failed";
-    return 0;
-  }
-  std::ifstream resultFile;
-  resultFile.open("temp.genomeResult");
-  if(!resultFile)
-  {
-    error = ERR_OPEN_FILE;
-    std::cerr << "error opening file";
-    return 0;
-  }
-  while(resultFile.good())
-  {
-    std::string line;
-    std::getline(resultFile,line);
-    value = atof(line.c_str());
-    break;
+      QProcess exec;
+      std::string appPath = l_userData.config.abaqusBatPath;
+      std::string scriptPath = l_userData.config.runForGenomeScriptPath;
+      std::string command = appPath + " cae noGUI=" + scriptPath;
+      exec.start(command.c_str());
+      exec.waitForFinished();
+      int exitcode = exec.exitCode();
+      if (exitcode != 0)
+      {
+        std::cerr << "script failed";
+        return 0;
+      }
+      std::ifstream resultFile;
+      resultFile.open("temp.genomeResult");
+      if(!resultFile)
+      {
+        std::cerr << "error opening file";
+        return 0;
+      }
+      while(resultFile.good())
+      {
+        std::string line;
+        std::getline(resultFile,line);
+        value = atof(line.c_str());
+        break;
+      }
+      l_genomeCollection.insert(l_genomeOut, value);
+      std::cerr << l_genomeCollection.getFitnessForGenome(l_genomeOut);
   }
   s_processedGenomeCounter += 1;
   fm::FileManager::AppendToGenomeCollector(l_userData.config, l_genomeOut, " generation: " +

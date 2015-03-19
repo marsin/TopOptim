@@ -59,8 +59,8 @@ public:
       for(unsigned int i=length-1; i!=0; i--) a[dest+i] = a[src+i];
   }
   void swap(unsigned int i, unsigned int j){T tmp=a[j]; a[j]=a[i]; a[i]=tmp;}
-  int size() const {return sz;}
-  int size(unsigned int n){
+  unsigned int size() const {return sz;}
+  unsigned int size(unsigned int n){
     if(n == sz) return sz;
     T * tmp = (n ? new T[n] : 0);
     for(int i=((n < sz) ? n-1 : sz-1); i>=0; i--) tmp[i] = a[i];

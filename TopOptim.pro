@@ -61,7 +61,8 @@ SOURCES += main.cpp\
     configurations.cpp \
     optimalizationwindow.cpp \
     optimconfigwindow.cpp \
-    optimalizationgal.cpp
+    optimalizationgal.cpp \
+    genomecollection.cpp
 
 HEADERS  += mainwindow.h \
     errorCodes.h \
@@ -123,7 +124,8 @@ HEADERS  += mainwindow.h \
     optimconfigwindow.h \
     ga/std_stream.h \
     ioptimalizationmanager.h \
-    optimalizationgal.h
+    optimalizationgal.h \
+    genomecollection.h
 
 FORMS    += gui/mainwindow.ui \
     configurationwindow.ui \
